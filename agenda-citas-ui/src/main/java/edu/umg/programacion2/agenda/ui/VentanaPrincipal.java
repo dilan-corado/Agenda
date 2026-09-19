@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -49,6 +51,7 @@ public class VentanaPrincipal extends JFrame {
     private JButton btnActualizar;
     private JButton btnEliminar;
     private JButton btnLimpiar;
+    private JButton btnContarServicios;
 
     private final CitaDAO citaDAO;
 
@@ -429,7 +432,6 @@ public class VentanaPrincipal extends JFrame {
         );
 
         tabla.setShowVerticalLines(false);
-
         tabla.setFillsViewportHeight(true);
 
         // CENTRAR COLUMNAS
@@ -506,10 +508,17 @@ public class VentanaPrincipal extends JFrame {
                         gris
                 );
 
+        btnContarServicios =
+                crearBoton(
+                        "Contar servicios",
+                        azul
+                );
+
         panelBotones.add(btnCrear);
         panelBotones.add(btnActualizar);
         panelBotones.add(btnEliminar);
         panelBotones.add(btnLimpiar);
+        panelBotones.add(btnContarServicios);
 
         panelCentro.add(
                 panelBotones,
@@ -532,6 +541,10 @@ public class VentanaPrincipal extends JFrame {
 
         btnLimpiar.addActionListener(
                 e -> limpiarFormulario()
+        );
+
+        btnContarServicios.addActionListener(
+                e -> mostrarConteoPorServicio()
         );
 
         tabla.getSelectionModel()
@@ -605,6 +618,89 @@ public class VentanaPrincipal extends JFrame {
 
             mostrarErrorBD(
                     "No se pudieron cargar las citas."
+            );
+        }
+    }
+
+    // CONTAR CITAS POR SERVICIO
+
+    private Map<String, Integer> contarCitasPorServicio()
+            throws SQLException {
+
+        List<Cita> citas =
+                citaDAO.listarTodos();
+
+        Map<String, Integer> conteo =
+                new LinkedHashMap<>();
+
+        for (Cita cita : citas) {
+
+            String servicio =
+                    cita.getServicio();
+
+            conteo.put(
+                    servicio,
+                    conteo.getOrDefault(
+                            servicio,
+                            0
+                    ) + 1
+            );
+        }
+
+        return conteo;
+    }
+
+    // MOSTRAR CONTEO POR SERVICIO
+
+    private void mostrarConteoPorServicio() {
+
+        try {
+
+            Map<String, Integer> conteo =
+                    contarCitasPorServicio();
+
+            if (conteo.isEmpty()) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "No hay citas registradas.",
+                        "Citas por servicio",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+
+                return;
+            }
+
+            StringBuilder mensaje =
+                    new StringBuilder();
+
+            for (Map.Entry<String, Integer> entrada
+                    : conteo.entrySet()) {
+
+                mensaje.append(
+                        entrada.getKey()
+                );
+
+                mensaje.append(": ");
+
+                mensaje.append(
+                        entrada.getValue()
+                );
+
+                mensaje.append("\n");
+            }
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    mensaje.toString(),
+                    "Citas por servicio",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+
+        } catch (SQLException e) {
+
+            mostrarErrorBD(
+                    "No se pudo calcular el conteo por servicio."
             );
         }
     }
