@@ -10,27 +10,34 @@ public class Cita {
     private String servicio;
     private int duracionMinutos;
     private String estado;
+    private boolean requiereConfirmacionLlamada;
 
     public Cita() {
     }
 
     public Cita(int id, String cliente, LocalDateTime fechaHora,
-                String servicio, int duracionMinutos, String estado) {
+                String servicio, int duracionMinutos, String estado,
+                boolean requiereConfirmacionLlamada) {
+
         this.id = id;
         this.cliente = cliente;
         this.fechaHora = fechaHora;
         this.servicio = servicio;
         this.duracionMinutos = duracionMinutos;
         this.estado = estado;
+        this.requiereConfirmacionLlamada = requiereConfirmacionLlamada;
     }
 
     public Cita(String cliente, LocalDateTime fechaHora,
-                String servicio, int duracionMinutos, String estado) {
+                String servicio, int duracionMinutos, String estado,
+                boolean requiereConfirmacionLlamada) {
+
         this.cliente = cliente;
         this.fechaHora = fechaHora;
         this.servicio = servicio;
         this.duracionMinutos = duracionMinutos;
         this.estado = estado;
+        this.requiereConfirmacionLlamada = requiereConfirmacionLlamada;
     }
 
     public int getId() {
@@ -81,6 +88,14 @@ public class Cita {
         this.estado = estado;
     }
 
+    public boolean isRequiereConfirmacionLlamada() {
+        return requiereConfirmacionLlamada;
+    }
+
+    public void setRequiereConfirmacionLlamada(boolean requiereConfirmacionLlamada) {
+        this.requiereConfirmacionLlamada = requiereConfirmacionLlamada;
+    }
+
     @Override
     public String toString() {
         return "[" + id + "] "
@@ -88,6 +103,8 @@ public class Cita {
                 + " | " + fechaHora
                 + " | " + servicio
                 + " | " + duracionMinutos + " min"
-                + " | " + estado;
+                + " | " + estado
+                + " | Confirmación llamada: "
+                + (requiereConfirmacionLlamada ? "Sí" : "No");
     }
 }
