@@ -15,6 +15,7 @@ import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -38,6 +39,8 @@ public class VentanaPrincipal extends JFrame {
     private JTextField txtDuracion;
 
     private JComboBox<String> cmbEstado;
+
+    private JCheckBox chkRequiereConfirmacionLlamada;
 
     private JTable tabla;
     private DefaultTableModel modeloTabla;
@@ -242,10 +245,29 @@ public class VentanaPrincipal extends JFrame {
                 gbc
         );
 
+        // FORMATO DE FECHA
+
+        JLabel lblFormato =
+                new JLabel(
+                        "Formato de fecha: yyyy-MM-dd HH:mm"
+                );
+
+        lblFormato.setForeground(gris);
+
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        gbc.gridwidth = 1;
+        gbc.weightx = 1;
+
+        panelFormulario.add(
+                lblFormato,
+                gbc
+        );
+
         // SERVICIO
 
         gbc.gridx = 0;
-        gbc.gridy = 2;
+        gbc.gridy = 3;
         gbc.weightx = 0;
 
         panelFormulario.add(
@@ -316,23 +338,28 @@ public class VentanaPrincipal extends JFrame {
                 gbc
         );
 
-        // FORMATO DE FECHA
+        // REQUIERE CONFIRMACIÓN POR LLAMADA
 
-        JLabel lblFormato =
-                new JLabel(
-                        "Formato de fecha: yyyy-MM-dd HH:mm"
+        chkRequiereConfirmacionLlamada =
+                new JCheckBox(
+                        "Requiere confirmación por llamada"
                 );
 
-        lblFormato.setForeground(gris);
+        chkRequiereConfirmacionLlamada.setBackground(
+                Color.WHITE
+        );
 
-        gbc.gridx = 2;
-        gbc.gridy = 2;
-        gbc.gridwidth = 2;
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.gridwidth = 4;
+        gbc.weightx = 1;
 
         panelFormulario.add(
-                lblFormato,
+                chkRequiereConfirmacionLlamada,
                 gbc
         );
+
+        gbc.gridwidth = 1;
 
         panelCentro.add(
                 panelFormulario,
@@ -349,7 +376,8 @@ public class VentanaPrincipal extends JFrame {
                                 "Fecha y hora",
                                 "Servicio",
                                 "Duración",
-                                "Estado"
+                                "Estado",
+                                "Confirmación llamada"
                         },
                         0
                 ) {
@@ -427,6 +455,10 @@ public class VentanaPrincipal extends JFrame {
 
         tabla.getColumnModel()
                 .getColumn(5)
+                .setCellRenderer(centro);
+
+        tabla.getColumnModel()
+                .getColumn(6)
                 .setCellRenderer(centro);
 
         JScrollPane scroll =
@@ -561,7 +593,10 @@ public class VentanaPrincipal extends JFrame {
                                         .format(formato),
                                 cita.getServicio(),
                                 cita.getDuracionMinutos(),
-                                cita.getEstado()
+                                cita.getEstado(),
+                                cita.isRequiereConfirmacionLlamada()
+                                        ? "Sí"
+                                        : "No"
                         }
                 );
             }
@@ -737,7 +772,8 @@ public class VentanaPrincipal extends JFrame {
                             fechaHora,
                             servicio,
                             duracion,
-                            "pendiente"
+                            "pendiente",
+                            chkRequiereConfirmacionLlamada.isSelected()
                     );
 
             citaDAO.crear(cita);
@@ -845,6 +881,17 @@ public class VentanaPrincipal extends JFrame {
                         )
                         .toString()
         );
+
+        chkRequiereConfirmacionLlamada.setSelected(
+                "Sí".equals(
+                        modeloTabla
+                                .getValueAt(
+                                        fila,
+                                        6
+                                )
+                                .toString()
+                )
+        );
     }
 
     // ACTUALIZAR
@@ -933,7 +980,8 @@ public class VentanaPrincipal extends JFrame {
                             fechaHora,
                             servicio,
                             duracion,
-                            estado
+                            estado,
+                            chkRequiereConfirmacionLlamada.isSelected()
                     );
 
             boolean actualizado =
@@ -1085,6 +1133,8 @@ public class VentanaPrincipal extends JFrame {
         cmbEstado.setSelectedItem(
                 "pendiente"
         );
+
+        chkRequiereConfirmacionLlamada.setSelected(false);
 
         tabla.clearSelection();
 
