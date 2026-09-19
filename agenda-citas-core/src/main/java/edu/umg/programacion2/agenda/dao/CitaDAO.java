@@ -19,8 +19,8 @@ public class CitaDAO {
     public Cita crear(Cita cita) throws SQLException {
 
         String sql = "INSERT INTO citas "
-                + "(cliente, fecha_hora, servicio, duracion_minutos, estado) "
-                + "VALUES (?, ?, ?, ?, ?)";
+                + "(cliente, fecha_hora, servicio, duracion_minutos, estado, requiere_confirmacion_llamada) "
+                + "VALUES (?, ?, ?, ?, ?, ?)";
 
         try (
             Connection conexion = Conexion.conectar();
@@ -31,13 +31,28 @@ public class CitaDAO {
         ) {
 
             ps.setString(1, cita.getCliente());
+
             ps.setTimestamp(
                     2,
                     Timestamp.valueOf(cita.getFechaHora())
             );
+
             ps.setString(3, cita.getServicio());
-            ps.setInt(4, cita.getDuracionMinutos());
-            ps.setString(5, cita.getEstado());
+
+            ps.setInt(
+                    4,
+                    cita.getDuracionMinutos()
+            );
+
+            ps.setString(
+                    5,
+                    cita.getEstado()
+            );
+
+            ps.setBoolean(
+                    6,
+                    cita.isRequiereConfirmacionLlamada()
+            );
 
             int filas = ps.executeUpdate();
 
@@ -66,7 +81,7 @@ public class CitaDAO {
 
         String sql =
                 "SELECT id, cliente, fecha_hora, servicio, "
-                + "duracion_minutos, estado "
+                + "duracion_minutos, estado, requiere_confirmacion_llamada "
                 + "FROM citas "
                 + "ORDER BY fecha_hora";
 
@@ -86,7 +101,8 @@ public class CitaDAO {
                                 .toLocalDateTime(),
                         rs.getString("servicio"),
                         rs.getInt("duracion_minutos"),
-                        rs.getString("estado")
+                        rs.getString("estado"),
+                        rs.getBoolean("requiere_confirmacion_llamada")
                 );
 
                 citas.add(cita);
@@ -103,7 +119,7 @@ public class CitaDAO {
 
         String sql =
                 "SELECT id, cliente, fecha_hora, servicio, "
-                + "duracion_minutos, estado "
+                + "duracion_minutos, estado, requiere_confirmacion_llamada "
                 + "FROM citas "
                 + "WHERE id = ?";
 
@@ -126,7 +142,8 @@ public class CitaDAO {
                                     .toLocalDateTime(),
                             rs.getString("servicio"),
                             rs.getInt("duracion_minutos"),
-                            rs.getString("estado")
+                            rs.getString("estado"),
+                            rs.getBoolean("requiere_confirmacion_llamada")
                     );
 
                     return Optional.of(cita);
@@ -148,7 +165,8 @@ public class CitaDAO {
                 + "fecha_hora = ?, "
                 + "servicio = ?, "
                 + "duracion_minutos = ?, "
-                + "estado = ? "
+                + "estado = ?, "
+                + "requiere_confirmacion_llamada = ? "
                 + "WHERE id = ?";
 
         try (
@@ -164,7 +182,10 @@ public class CitaDAO {
                     Timestamp.valueOf(cita.getFechaHora())
             );
 
-            ps.setString(3, cita.getServicio());
+            ps.setString(
+                    3,
+                    cita.getServicio()
+            );
 
             ps.setInt(
                     4,
@@ -176,8 +197,13 @@ public class CitaDAO {
                     cita.getEstado()
             );
 
-            ps.setInt(
+            ps.setBoolean(
                     6,
+                    cita.isRequiereConfirmacionLlamada()
+            );
+
+            ps.setInt(
+                    7,
                     cita.getId()
             );
 
