@@ -42,11 +42,13 @@ CREATE TABLE IF NOT EXISTS citas (
 
     duracion_minutos INT NOT NULL,
 
-    estado ENUM(
+        estado ENUM(
         'pendiente',
         'confirmada',
         'cancelada'
     ) NOT NULL DEFAULT 'pendiente',
+
+    requiere_confirmacion_llamada BOOLEAN NOT NULL DEFAULT FALSE,
 
     CHECK (duracion_minutos > 0)
 );
